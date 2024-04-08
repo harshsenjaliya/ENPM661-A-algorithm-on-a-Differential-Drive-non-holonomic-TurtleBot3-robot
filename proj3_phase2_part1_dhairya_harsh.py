@@ -237,3 +237,28 @@ def valid_orientation(theta):
         return theta
     else:
         return False
+
+
+def back_track(goal_node):
+    x_path = []
+    y_path = []
+    theta_path = []
+    x_path.append(goal_node.x)
+    y_path.append(goal_node.y)
+    theta_path.append(goal_node.current_theta)
+    parent_node = goal_node.parent
+
+    while parent_node != -1:
+        x_path.append(parent_node.x)
+        y_path.append(parent_node.y)
+        theta_path.append(parent_node.current_theta)
+        parent_node = parent_node.parent
+
+    x_path.reverse()
+    y_path.reverse()
+    theta_path.reverse()
+
+    x = np.asarray(x_path)
+    y = np.asarray(y_path)
+    theta = np.array(theta_path)
+    return x, y, theta
