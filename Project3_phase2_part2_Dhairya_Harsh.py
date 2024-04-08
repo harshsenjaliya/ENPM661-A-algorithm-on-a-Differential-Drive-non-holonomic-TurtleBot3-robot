@@ -221,7 +221,7 @@ def valid_move(x, y, r, c):
 def check_goal(current, goal):
     dt = dist((current.x, current.y), (goal.x, goal.y))
 
-    if dt < 50:
+    if dt < 100:
         return True
     else:
         return False
@@ -276,8 +276,8 @@ def euclidean_distance(point1, point2):
     return math.sqrt((point2[0] - point1[0]) * 2 + (point2[1] - point1[1]) * 2)
 
 def calculate_twist(rpm1,rpm2,theta):
-    r = 0.04
-    L = 0.16
+    r = 40
+    L = 16
     linear_x = []
     angular_z = []
     for i in range(len(rpm1)):
