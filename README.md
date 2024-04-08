@@ -14,13 +14,13 @@ This part of the project implements the A* search algorithm for path planning on
 ### Instructions
 To run the 2D implementation, follow these steps:
 1. Clone the repository:
-'''bash git clone https://github.com/
+```git clone https://github.com/```
 
 2. Navigate to the directory where the repository is cloned.
-'''css cd Path-Planning-for-a-differential-drive-robot-using-A-Star-Search-Algorithm
+```cd Path-Planning-for-a-differential-drive-robot-using-A-Star-Search-Algorithm```
 
 3. Run the Python script 'Part01.py' with the following command:
-python3 Phase1.py
+```python3 Proj3_phase2_part1_Dhairya_Harsh.py```
 
 4. Follow the prompts in the terminal to input the required parameters.
 
@@ -33,13 +33,31 @@ To run the Gazebo visualization, follow these steps:
 
 1. Copy and paste the a_star_turtlebot package into the src folder of your Catkin workspace.
 2. Run the following commands in the terminal:
-   '''bash
-cd ~/catkin_ws
-catkin_make
-source devel/setup.bash
-roslaunch a_star_turtlebot proj.launch
+Create a workpace
+```mkdir -p project3_ws/src```
+```cd ~/project3_ws/src```
 
-3. Follow the prompts in the terminal to input the required parameters.
-4. The robot will start moving towards the goal node.
-5. To exit Gazebo, press 'Ctrl+C' in the terminal.
+Clone the reposiory
+```git clone https://github.com/```
+
+Source ROS 
+```source /opt/ros/galactic/setup.bash```
+
+Build the workspace
+```cd ~\project3_ws```
+```colcon build --packages-select turtlebot3_project3```
+
+Source ROS (Package will be identified)
+```source install/setup.bash```
+
+Run Code to Test
+Launch Environment
+```ros2 launch turtlebot3_project3 competition_world.launch.py```
+
+3. Opem the new terminal window and Source workspace using command:
+```source install/setup.bash```
+4. Execute following command:
+```ros2 run turtlebot3_project3 Proj3_phase2_part2_Dhairya_Harsh.py```
+5. After closing the plot simulation in Gazebo will begin. 
+6. To exit Gazebo, press 'Ctrl+C' in the terminal.
    
