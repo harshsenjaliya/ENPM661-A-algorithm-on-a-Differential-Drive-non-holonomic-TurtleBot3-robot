@@ -214,3 +214,26 @@ def obstacle_space_check(x, y, radius, clearance):
         return True
     else:
         return False
+
+
+def valid_move(x, y, r, c):
+    if obstacle_space_check(x, y, r, c):
+        return False
+    else:
+        return True
+
+
+def check_goal(current, goal):
+    dt = dist((current.x, current.y), (goal.x, goal.y))
+
+    if dt < 50:
+        return True
+    else:
+        return False
+
+
+def valid_orientation(theta):
+    if((theta%30)==0):
+        return theta
+    else:
+        return False
