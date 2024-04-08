@@ -16,15 +16,15 @@ To run the 2D implementation, follow these steps:
 1. Clone the repository:
 ```git clone https://github.com/harshsenaliya4433/ENPM661-A-algorithm-on-a-Differential-Drive-non-holonomic-TurtleBot3-robot.git```
 
-2. Navigate to the directory where the repository is cloned.
+3. Navigate to the directory where the repository is cloned.
 ```cd Path-Planning-for-a-differential-drive-robot-using-A-Star-Search-Algorithm```
 
-3. Run the Python script 'Part01.py' with the following command:
+4. Run the Python script 'Part01.py' with the following command:
 ```python3 Proj3_phase2_part1_Dhairya_Harsh.py```
 
-4. Follow the prompts in the terminal to input the required parameters.
+5. Follow the prompts in the terminal to input the required parameters.
 
-5. The path will be visualized in a plot after a few seconds.
+6. The path will be visualized in a plot after a few seconds.
 
 
 ## Part 2: 2D Implementation
@@ -38,7 +38,7 @@ Create a workpace
 ```cd ~/project3_ws/src```
 
 Clone the reposiory
-```git clone https://github.com/```
+```git clone https://github.com/harshsenaliya4433/ENPM661-A-algorithm-on-a-Differential-Drive-non-holonomic-TurtleBot3-robot.git```
 
 Source ROS 
 ```source /opt/ros/galactic/setup.bash```
