@@ -102,3 +102,98 @@ def plot_curve(Xi, Yi, Thetai, UL, UR, c, plot, Nodes_list, Path_list):
 def key(node):
     key = 1000 * node.x + 111 * node.y
     return key
+
+def Astar(start_node, goal_node, rpm1, rpm2, radius, clearance):
+
+    # Check if the goal node is reached
+    if check_goal(start_node, goal_node):
+        return 1, None, None
+
+    start_node = start_node
+    start_node_id = key(start_node)
+    goal_node = goal_node
+
+    Nodes_list = []  # List to store all the explored nodes
+    Path_list = []  # List to store the final path from start to goal node
+
+    closed_node = {}  # Dictionary to store all the closed nodes
+    open_node = {}  # Dictionary to store all the open nodes
+
+    open_node[start_node_id] = start_node   # Add the start node to the open nodes dictionary
+
+    priority_list = []  # Priority queue to store nodes based on their total cost
+
+    # All the possible moves of the robot
+    moves = [[rpm1, 0],
+             [0, rpm1],
+             [rpm1, rpm1],
+             [0, rpm2],
+             [rpm2, 0],
+             [rpm2, rpm2],
+             [rpm1, rpm2],
+             [rpm2, rpm1]]
+
+    # Push the start node into the priority queue with its total cost
+    heapq.heappush(priority_list, [start_node.total_cost, start_node])
+
+    while (len(priority_list) != 0):
+
+        # Pop the node with the minimum cost from the priority queue
+        current_nodes = (heapq.heappop(priority_list))[1]
+        current_id = key(current_nodes)
+
+        # Check if the popped node is the goal node
+        if check_goal(current_nodes, goal_node):
+            goal_node.parent = current_nodes.parent
+            goal_node.total_cost = current_nodes.total_cost
+            print("Goal Node found")
+            return 1, Nodes_list, Path_list
+
+        # Add the popped node to the closed nodes dictionary
+        if current_id in closed_node:
+            continue
+        else:
+            closed_node[current_id] = current_nodes
+
+        del open_node[current_id]
+
+        # Loop through all the possible moves
+        for move in moves:
+            action = plot_curve(current_nodes.x, current_nodes.y, current_nodes.current_theta, move[0], move[1],
+                            clearance, 0, Nodes_list, Path_list)
+
+            # Check if the move is valid
+            if (action != None):
+                angle = action[2]
+
+                # Round off the coordinates and the angle to nearest integer
+                theta_lim = 30
+                x = (round(action[0] * 10) / 10)
+                y = (round(action[1] * 10) / 10)
+                theta = (round(angle / theta_lim) * theta_lim)
+
+                # Calculate the new orientation and the cost to move to the new node
+                current_theta = current_nodes.change_theta - theta
+                c2g = dist((x,y), (goal_node.x, goal_node.y))
+                new_node = Node(x, y, current_nodes, theta, current_theta, move[0], move[1], current_nodes.c2c+action[3], c2g, current_nodes.c2c+action[3]+c2g)
+
+                new_node_id = key(new_node)
+
+                # Check if the new node is valid and has not already been visited
+                if not valid_move(new_node.x, new_node.y, radius, clearance):
+                    continue
+                elif new_node_id in closed_node:
+                    continue
+
+                # Update the node information if it already exists in the open list
+                if new_node_id in open_node:
+                    if new_node.total_cost < open_node[new_node_id].total_cost:
+                        open_node[new_node_id].total_cost = new_node.total_cost
+                        open_node[new_node_id].parent = new_node
+
+                # Add the new node to the open list if it doesn't already exist
+                else:
+                    open_node[new_node_id] = new_node
+                    heapq.heappush(priority_list, [ open_node[new_node_id].total_cost, open_node[new_node_id]])
+
+    return 0, Nodes_list, Path_list
