@@ -304,26 +304,17 @@ def publish_twist_messages(linear_x, angular_z):
     publisher = node.create_publisher(Twist, 'cmd_vel', 10)
     msg = Twist()
 
-    # Calculate the time interval based on the desired frequency
-    interval = 1
+    for linear, angular in zip(linear_x, angular_z):
+        # Publish twist message
+        msg.linear.x = linear
+        msg.angular.z = angular
+        publisher.publish(msg)
+        node.get_logger().info("Published twist message: Linear=%.2f, Angular=%.2f" % (msg.linear.x, msg.angular.z))
 
-    while rclpy.ok():
-        start_time = time.time()
+        # Wait for 1 second
+        time.sleep(0.1)
 
-        for linear, angular in zip(linear_x, angular_z):
-            msg.linear.x = linear
-            msg.angular.z = angular
-            publisher.publish(msg)
-            node.get_logger().info("Published twist message: Linear=%.2f, Angular=%.2f" % (msg.linear.x, msg.angular.z))
-
-            # Calculate the time elapsed since the start of the loop
-            elapsed_time = time.time() - start_time
-
-            # If there's remaining time in the interval, wait
-            if elapsed_time < interval:
-                time.sleep(interval - elapsed_time)
-
-    rclpy.shutdown()       
+    rclpy.shutdown()      
     
 def main():
     plotter = Plotter()
