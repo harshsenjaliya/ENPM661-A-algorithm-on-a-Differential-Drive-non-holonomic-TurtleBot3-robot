@@ -296,6 +296,25 @@ def calculate_twist2(x_path, y_path):
             angle.append(math.atan2(y_path[i + 1] - y_path[i], x_path[i + 1] - x_path[i]))
             angular_z.append(angle[i] / 2)  # Adjust angular velocity as needed
             return linear_x, angular_z, distance
+
+def publish_twist_messages(linear_x, angular_z):
+    rclpy.init()
+    node = rclpy.create_node('publisher')
+
+    publisher = node.create_publisher(Twist, 'cmd_vel', 10)
+    msg = Twist()
+
+    rate = node.create_rate(10)  # 10 Hz
+
+    while rclpy.ok():
+        for linear, angular in zip(linear_x, angular_z):
+            msg.linear.x = linear
+            msg.angular.z = angular
+            publisher.publish(msg)
+            node.get_logger().info("Published twist message: Linear=%.2f, Angular=%.2f" % (msg.linear.x, msg.angular.z))
+            rate.sleep()
+
+    rclpy.shutdown()        
     
 def main():
     plotter = Plotter()
@@ -357,6 +376,7 @@ def main():
     print(len(linx), len(angz), len(distance), "Lengths form Calculate Twist 2")
     print(linx, angz, distance)
     print(len(x_path), x_path)
+    publish_twist_messages(linear_x, angular_z)
 
 if __name__ == '__main__':
     main()
