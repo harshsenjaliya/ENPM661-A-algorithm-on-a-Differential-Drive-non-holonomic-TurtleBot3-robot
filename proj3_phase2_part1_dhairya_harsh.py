@@ -197,3 +197,20 @@ def Astar(start_node, goal_node, rpm1, rpm2, radius, clearance):
                     heapq.heappush(priority_list, [ open_node[new_node_id].total_cost, open_node[new_node_id]])
 
     return 0, Nodes_list, Path_list
+
+def obstacle_space_check(x, y, radius, clearance):
+    total_space = radius + clearance
+
+    obstacle1 = ((np.square(x - 4000)) + (np.square(y - 1100)) <= np.square(500 + total_space))
+    obstacle2 = (x >= 1500 - total_space) and (x <= 1625 + total_space) and (y >= 750 - total_space)
+    obstacle3 = (x >= 2500 - total_space) and (x <= 2625 + total_space) and (y <= 1250 + total_space)
+
+    border1 = (x <= 0 + total_space)
+    border2 = (x >= 5990 - total_space)
+    border3 = (y <= 0 + total_space)
+    border4 = (y >= 1990 - total_space)
+
+    if obstacle1 or obstacle2 or obstacle3 or border1 or border2 or border3 or border4:
+        return True
+    else:
+        return False
