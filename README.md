@@ -21,10 +21,19 @@ To run the 2D implementation, follow these steps:
 
 4. Run the Python script 'Part01.py' with the following command:
 ```python3 Proj3_phase2_part1_Dhairya_Harsh.py```
+Sample Inputs 
+start_x = 500
+start_y = 1000
+clearance = 5
+goal_x = 5750
+goal_y = 1000
+rpm1 = 10
+rpm2 = 5
+goal_orientation = 0
 
-5. Follow the prompts in the terminal to input the required parameters.
+6. Follow the prompts in the terminal to input the required parameters.
 
-6. The path will be visualized in a plot after a few seconds.
+7. The path will be visualized in a plot after a few seconds.
 
 
 ## Part 2: Implementation of Gazebo visualization
@@ -58,8 +67,11 @@ Launch Environment
 ```source install/setup.bash```
 4. Execute following command:
 ```ros2 run turtlebot3_project3 Proj3_phase2_part2_Dhairya_Harsh.py```
-5. After closing the plot simulation in Gazebo will begin. 
-6. To exit Gazebo, press 'Ctrl+C' in the terminal.
+Sample Inputs 
+goal_x = 5750
+goal_y = 1000
+6. After closing the plot simulation in Gazebo will begin. 
+7. To exit Gazebo, press 'Ctrl+C' in the terminal.
 
 Output Video reference: Part-1```https://youtu.be/BYHxcvdin9k```
 Part-2```https://youtu.be/RQ4x9f2U4tc```
