@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 import numpy as np
 import math
@@ -14,9 +15,9 @@ class Plotter:
     def __init__(self):
         self.figure, self.axes = plt.subplots()
         self.axes.set(xlim=(0, 6000), ylim=(0, 2000))
-        self.obstacle1 = plt.Circle((4000, 1100), 500, fill=True, color='red')
-        self.obstacle2 = patches.Rectangle((1500, 750), 150, 1250, color='red')
-        self.obstacle3 = patches.Rectangle((2500, 0), 150, 1250, color='red')  
+        self.obstacle1 = plt.Circle((4200, 1200), (600), fill=True, color='red')
+        self.obstacle2 = patches.Rectangle((1500, 1000), 250, 1000, color='red')
+        self.obstacle3 = patches.Rectangle((2500, 0), 250, 1000, color='red')  
         self.axes.set_aspect('equal')
         self.axes.add_artist(self.obstacle1)
         self.axes.add_artist(self.obstacle2)
@@ -66,8 +67,8 @@ class Node:
 
 def plot_curve(Xi, Yi, Thetai, UL, UR, c, plot, Nodes_list, Path_list):
     t = 0
-    r = 33 #Robot Wheel Radius
-    L = 287 # Distance vetween the wheels of the robot. 
+    r = 33 
+    L = 287  
     dt = 0.1
     cost = 0
     X_end = Xi
@@ -90,16 +91,51 @@ def plot_curve(Xi, Yi, Thetai, UL, UR, c, plot, Nodes_list, Path_list):
                 plt.plot([X_start, X_end], [Y_start, Y_end], color="red")
         else:
             return None
+
     Theta_end = 180 * (Theta_end) / math.pi
     return [X_end, Y_end, Theta_end, cost, Nodes_list, Path_list]
 
 def key(node):
     key = 1000 * node.x + 111 * node.y
     return key
+    
+def is_point_inside_rectangle(x, y, vertices):
+    x_min = min(vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0])
+    x_max = max(vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0])
+    y_min = min(vertices[0][1], vertices[1][1], vertices[2][1], vertices[3][1])
+    y_max = max(vertices[0][1], vertices[1][1], vertices[2][1], vertices[3][1])
+    return x_min <= x <= x_max and y_min <= y <= y_max
+
+def is_point_inside_circle(x, y, center_x, center_y, diameter):
+    radius = diameter / 2.0 
+    distance = math.sqrt((x - center_x) ** 2 + (y - center_y) ** 2)
+    return distance <= radius
+
+def obstacle_space_check(x, y, robot_radius, clearance):
+   
+    rectangle1_buffer_vts = [(1500 - (robot_radius + clearance), 2000), (1750 + (robot_radius + clearance), 2000), (1750 + (robot_radius + clearance), 1000 - (robot_radius + clearance)), (1500 - (robot_radius + clearance), 1000 - (robot_radius + clearance))]
+    rectangle2_buffer_vts = [(2500 - (robot_radius + clearance), 1000 + (robot_radius + clearance)), (2750 + (robot_radius + clearance), 1000 - (robot_radius + clearance)), (2750 + (robot_radius + clearance), 0), (2500 - (robot_radius + clearance), 0)]
+
+    rect1_buffer = is_point_inside_rectangle(x,y, rectangle1_buffer_vts)
+    rect2_buffer = is_point_inside_rectangle(x, y, rectangle2_buffer_vts)
+    circ_buffer = is_point_inside_circle(x, y, 4200, 1300, 1200 + 2*(robot_radius + clearance))
+    
+    if rect1_buffer or rect2_buffer or circ_buffer:
+        return True
+    
+    if x <= (robot_radius + clearance) or y >= 2000 - (robot_radius + clearance) or x >= 6000 - (robot_radius + clearance) or y <= (robot_radius + clearance):
+        return True
+
+    return False
+    
+def valid_move(x, y, r, c):
+    if obstacle_space_check(x, y, r, c):
+        return False
+    else:
+        return True
 
 def Astar(start_node, goal_node, rpm1, rpm2, radius, clearance):
 
-    # Check if the goal node is reached 
     if check_goal(start_node, goal_node):
         return 1, None, None
     
@@ -107,17 +143,16 @@ def Astar(start_node, goal_node, rpm1, rpm2, radius, clearance):
     start_node_id = key(start_node)
     goal_node = goal_node
 
-    Nodes_list = []  # List to store all the explored nodes
-    Path_list = []  # List to store the final path from start to goal node
+    Nodes_list = [] 
+    Path_list = []  
 
-    closed_node = {}  # Dictionary to store all the closed nodes
-    open_node = {}  # Dictionary to store all the open nodes
+    closed_node = {} 
+    open_node = {} 
     
-    open_node[start_node_id] = start_node   # Add the start node to the open nodes dictionary
+    open_node[start_node_id] = start_node 
 
-    priority_list = []  # Priority queue to store nodes based on their total cost
+    priority_list = [] 
     
-    # All the possible moves of the robot
     moves = [[rpm1, 0], 
              [0, rpm1], 
              [rpm1, rpm1], 
@@ -127,23 +162,19 @@ def Astar(start_node, goal_node, rpm1, rpm2, radius, clearance):
              [rpm1, rpm2],
              [rpm2, rpm1]]
 
-    # Push the start node into the priority queue with its total cost
     heapq.heappush(priority_list, [start_node.total_cost, start_node])
 
     while (len(priority_list) != 0):
 
-        # Pop the node with the minimum cost from the priority queue
         current_nodes = (heapq.heappop(priority_list))[1]
         current_id = key(current_nodes)
 
-        # Check if the popped node is the goal node
         if check_goal(current_nodes, goal_node):
             goal_node.parent = current_nodes.parent
             goal_node.total_cost = current_nodes.total_cost
             print("Goal Node found")
             return 1, Nodes_list, Path_list
         
-        # Add the popped node to the closed nodes dictionary
         if current_id in closed_node:  
             continue
         else:
@@ -151,88 +182,53 @@ def Astar(start_node, goal_node, rpm1, rpm2, radius, clearance):
         
         del open_node[current_id]
         
-        # Loop through all the possible moves
         for move in moves:
             action = plot_curve(current_nodes.x, current_nodes.y, current_nodes.current_theta, move[0], move[1],
                             clearance, 0, Nodes_list, Path_list)
            
-            # Check if the move is valid
             if (action != None):
                 angle = action[2]
                 
-                # Round off the coordinates and the angle to nearest integer
                 theta_lim = 30
                 x = (round(action[0] * 10) / 10)
                 y = (round(action[1] * 10) / 10)
                 theta = (round(angle / theta_lim) * theta_lim)
                 
-                # Calculate the new orientation and the cost to move to the new node
                 current_theta = current_nodes.change_theta - theta
                 c2g = dist((x,y), (goal_node.x, goal_node.y))
                 new_node = Node(x, y, current_nodes, theta, current_theta, move[0], move[1], current_nodes.c2c+action[3], c2g, current_nodes.c2c+action[3]+c2g)
 
                 new_node_id = key(new_node)
                 
-                # Check if the new node is valid and has not already been visited
                 if not valid_move(new_node.x, new_node.y, radius, clearance):
                     continue
                 elif new_node_id in closed_node:
                     continue
 
-                # Update the node information if it already exists in the open list
                 if new_node_id in open_node:
                     if new_node.total_cost < open_node[new_node_id].total_cost:
                         open_node[new_node_id].total_cost = new_node.total_cost
                         open_node[new_node_id].parent = new_node
-
-                # Add the new node to the open list if it doesn't already exist        
+       
                 else:
                     open_node[new_node_id] = new_node
                     heapq.heappush(priority_list, [ open_node[new_node_id].total_cost, open_node[new_node_id]])
             
     return 0, Nodes_list, Path_list
 
-
-def obstacle_space_check(x, y, radius, clearance):
-    total_space = radius + clearance
-
-    obstacle1 = ((np.square(x - 4000)) + (np.square(y - 1100)) <= np.square(500 + total_space))
-    obstacle2 = (x >= 1500 - total_space) and (x <= 1625 + total_space) and (y >= 750 - total_space)
-    obstacle3 = (x >= 2500 - total_space) and (x <= 2625 + total_space) and (y <= 1250 + total_space)
- 
-    border1 = (x <= 0 + total_space)     
-    border2 = (x >= 5990 - total_space)
-    border3 = (y <= 0 + total_space)
-    border4 = (y >= 1990 - total_space)
-
-    if obstacle1 or obstacle2 or obstacle3 or border1 or border2 or border3 or border4:
-        return True
-    else:
-        return False
-    
-
-def valid_move(x, y, r, c):
-    if obstacle_space_check(x, y, r, c):
-        return False
-    else:
-        return True
-
-
 def check_goal(current, goal):
     dt = dist((current.x, current.y), (goal.x, goal.y))
 
-    if dt < 50:
+    if dt < 100:
         return True
     else:
         return False
 
-
 def valid_orientation(theta):
-    if theta==0 or theta ==30 or theta==60 or theta==90 :
-        return theta
+    if (theta % 30 == 0):
+        return True
     else:
         return False
-
 
 def back_track(goal_node):  
     x_path = []
@@ -276,57 +272,47 @@ def euclidean_distance(point1, point2):
     return math.sqrt((point2[0] - point1[0]) * 2 + (point2[1] - point1[1]) * 2)
 
 def calculate_twist(rpm1,rpm2,theta):
-    r = 33
-    L = 287
+    r = 0.33
+    L = 0.287
     linear_x = []
     angular_z = []
     for i in range(len(rpm1)):
-        linear_x.append((r/2) * ((rpm1[i]*(2*math.pi/60))+(rpm2[i]*(2*math.pi/60))*(math.cos(theta[i]*(math.pi/180)))))
-        angular_z.append((r/L) * ((rpm1[i]*(2*math.pi/60))-(rpm2[i]*(2*math.pi/60))))
+        linear_x.append((r/2) * ((rpm1[i]*(2*math.pi/60))+(rpm2[i]*(2*math.pi/60))))
+        angular_z.append((r/L) * ((rpm2[i]*(2*math.pi/60))-(rpm1[i]*(2*math.pi/60))))
     return linear_x, angular_z
 
 def publish_twist_messages(linear_x, angular_z):
     rclpy.init()
     node = rclpy.create_node('publisher')
 
-    publisher = node.create_publisher(Twist, 'cmd_vel', 8)
+    publisher = node.create_publisher(Twist, 'cmd_vel', 10)
     msg = Twist()
 
     for linear, angular in zip(linear_x, angular_z):
-        # Publish twist message
         msg.linear.x = linear
         msg.angular.z = angular
         publisher.publish(msg)
         node.get_logger().info("Published twist message: Linear=%.2f, Angular=%.2f" % (msg.linear.x, msg.angular.z))
+        time.sleep(1)
+    rclpy.shutdown()
 
-        # Wait for 1 second
-        time.sleep(0.9)
-
-    rclpy.shutdown()      
-    
 def main():
     plotter = Plotter()
-    robot_radius = 220
-
-    clearance = float(input("Enter clearance of robot (in mm): "))
-    print("Enter RPM in RPM")
-    RPM1 = int(input("Enter High RPM: "))
-    RPM2 = int(input("Enter Low RPM: "))
-
-    start_x = float(input("Enter Start X coordinate (in mm): "))
-    start_y = float(input("Enter start Y coordinate (in mm): "))
+    radius = 230
+    clearance = 5
+    RPM1 = 10
+    RPM2 = 5
+    start_x = 500
+    start_y =  1000
 
     goal_x = float(input("Enter X coordinate of Goal (in mm): "))
     goal_y = float(input("Enter Y coordinate of Goal (in mm): "))
 
-    if not valid_move(start_x, start_y, robot_radius, clearance) or not valid_move(goal_x, goal_y, robot_radius, clearance):
+    if not valid_move(goal_x, goal_y, radius, clearance):
         print("Invalid start or goal node, or in obstacle space")
         exit(-1)
 
-    start_theta = int(input("Enter orientation of the robot at start node: "))
-    if not valid_orientation(start_theta):
-        print("Orientation has to be a multiple of 30")
-        exit(-1)
+    start_theta = 0
 
     timer_start = time.time()
 
@@ -336,7 +322,7 @@ def main():
     start_node = Node(start_x, start_y, -1, start_theta, 0, 0, 0, 0, c2g, total_cost)
     goal_node = Node(goal_x, goal_y, -1, 0, 0, 0, 0, c2g, 0, total_cost)
 
-    flag, Nodes_list, Path_list = Astar(start_node, goal_node, RPM1, RPM2, robot_radius, clearance)
+    flag, Nodes_list, Path_list = Astar(start_node, goal_node, RPM1, RPM2, radius, clearance)
 
     if flag == 1:
         x_path, y_path, theta_path, rpm1, rpm2 = back_track(goal_node)
@@ -344,11 +330,8 @@ def main():
         print("Path not found")
         exit(-1)
 
-    plotter.plot_start_and_goal(start_node, goal_node) 
-    def update(frame):
-        plotter.update_plot(Nodes_list[:frame+1], Path_list)
-    
-    anim = FuncAnimation(plotter.figure, update, frames=len(Nodes_list), interval=50)
+    plotter.plot_start_and_goal(start_node, goal_node)
+    plotter.update_plot(Nodes_list, Path_list) 
     plotter.axes.plot(x_path, y_path, '-r') 
     
     timer_stop = time.time()
@@ -356,11 +339,9 @@ def main():
     plt.show()
     
     print("Total Runtime: ", runtime)
+    print("Total Cost", total_cost)
 
     linear_x, angular_z = calculate_twist(rpm1, rpm2, theta_path)
-    print(len(linear_x), len(angular_z), "Lengths from Calcualte Twist 1")
-    print(linear_x, angular_z)
-    print(len(x_path), x_path)
     publish_twist_messages(linear_x, angular_z)
 
 if __name__ == '__main__':
