@@ -66,8 +66,8 @@ class Node:
 
 def plot_curve(Xi, Yi, Thetai, UL, UR, c, plot, Nodes_list, Path_list):
     t = 0
-    r = 40 #Robot Wheel Radius
-    L = 160 # Distance vetween the wheels of the robot. 
+    r = 33 #Robot Wheel Radius
+    L = 287 # Distance vetween the wheels of the robot. 
     dt = 0.1
     cost = 0
     X_end = Xi
@@ -276,8 +276,8 @@ def euclidean_distance(point1, point2):
     return math.sqrt((point2[0] - point1[0]) * 2 + (point2[1] - point1[1]) * 2)
 
 def calculate_twist(rpm1,rpm2,theta):
-    r = 40
-    L = 16
+    r = 33
+    L = 287
     linear_x = []
     angular_z = []
     for i in range(len(rpm1)):
@@ -318,7 +318,7 @@ def publish_twist_messages(linear_x, angular_z):
     
 def main():
     plotter = Plotter()
-    robot_radius = 100
+    robot_radius = 220
 
     clearance = float(input("Enter clearance of robot (in mm): "))
     print("Enter RPM in RPM")
