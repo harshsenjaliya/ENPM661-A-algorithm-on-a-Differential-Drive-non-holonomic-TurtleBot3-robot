@@ -262,3 +262,62 @@ def back_track(goal_node):
     y = np.asarray(y_path)
     theta = np.array(theta_path)
     return x, y, theta
+
+def main():
+    plotter = Plotter()
+
+    width = 6000
+    height = 2000
+    robot_radius = 33
+
+    clearance = float(input("Enter clearance of robot (in mm): "))
+    print("Enter RPM in RPM")
+    RPM1 = int(input("Enter High RPM: "))
+    RPM2 = int(input("Enter Low RPM: "))
+
+    start_x = float(input("Enter Start X coordinate (in mm): "))
+    start_y = float(input("Enter start Y coordinate (in mm): "))
+
+    goal_x = float(input("Enter X coordinate of Goal (in mm): "))
+    goal_y = float(input("Enter Y coordinate of Goal (in mm): "))
+
+    if not valid_move(start_x, start_y, robot_radius, clearance) or not valid_move(goal_x, goal_y, robot_radius, clearance):
+        print("Invalid start or goal node, or in obstacle space")
+        exit(-1)
+
+    start_theta = int(input("Enter orientation of the robot at start node: "))
+    if not valid_orientation(start_theta):
+        print("Orientation has to be a multiple of 30")
+        exit(-1)
+
+    timer_start = time.time()
+
+    c2g = dist((start_x, start_y), (goal_x, goal_y))
+    total_cost = c2g
+
+    start_node = Node(start_x, start_y, -1, start_theta, 0, 0, 0, 0, c2g, total_cost)
+    goal_node = Node(goal_x, goal_y, -1, 0, 0, 0, 0, c2g, 0, total_cost)
+
+    flag, Nodes_list, Path_list = Astar(start_node, goal_node, RPM1, RPM2, robot_radius, clearance)
+
+    if flag == 1:
+        x_path, y_path, theta_path = back_track(goal_node)
+    else:
+        print("Path not found")
+        exit(-1)
+
+    plotter.plot_start_and_goal(start_node, goal_node)
+    # plotter.plot_backtrack_path(zip(x_path, y_path))
+    def update(frame):
+        plotter.update_plot(Nodes_list[:frame+1], Path_list)
+
+    anim = FuncAnimation(plotter.figure, update, frames=len(Nodes_list), interval=50)
+
+    timer_stop = time.time()
+    runtime = timer_stop - timer_start
+
+    plt.show()
+    print("Total Runtime: ", runtime)
+
+if __name__ == '__main__':
+    main()
