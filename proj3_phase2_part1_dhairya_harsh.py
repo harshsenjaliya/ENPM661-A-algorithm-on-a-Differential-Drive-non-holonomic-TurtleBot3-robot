@@ -53,3 +53,52 @@ class Plotter:
             backtrack_x, backtrack_y = zip(*backtrack_path)
             self.path_line, = self.axes.plot(backtrack_x, backtrack_y, '-g')
         plt.show()
+
+class Node:
+    def __init__(self, x, y, parent, current_theta, change_theta, UL, UR, c2c, c2g, total_cost):
+        self.x = x
+        self.y = y
+        self.parent = parent
+        self.current_theta = current_theta
+        self.change_theta = change_theta
+        self.UL = UL
+        self.UR = UR
+        self.c2c = c2c
+        self.c2g = c2g
+        self.total_cost = total_cost
+
+    def __lt__(self, other):
+        return self.total_cost < other.total_cost
+
+def plot_curve(Xi, Yi, Thetai, UL, UR, c, plot, Nodes_list, Path_list):
+    t = 0
+    r = 40
+    L = 160
+    dt = 0.1
+    cost = 0
+    X_end = Xi
+    Y_end = Yi
+    Theta_end = math.pi * Thetai / 180
+
+    while t < 1:
+        t = t + dt
+        X_start = X_end
+        Y_start = Y_end
+        X_end += r * 0.5 * (UL + UR) * math.cos(Theta_end) * dt
+        Y_end += r * 0.5 * (UL + UR) * math.sin(Theta_end) * dt
+        Theta_end += (r / L) * (UR - UL) * dt
+
+        if valid_move(X_end, Y_end, r, c):
+            if plot == 0:
+                Nodes_list.append((X_end, Y_end))
+                Path_list.append((X_start, Y_start))
+            if plot == 1:
+                plt.plot([X_start, X_end], [Y_start, Y_end], color="red")
+        else:
+            return None
+    Theta_end = 180 * (Theta_end) / math.pi
+    return [X_end, Y_end, Theta_end, cost, Nodes_list, Path_list]
+
+def key(node):
+    key = 1000 * node.x + 111 * node.y
+    return key
