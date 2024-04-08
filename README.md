@@ -21,10 +21,19 @@ To run the 2D implementation, follow these steps:
 
 4. Run the Python script 'Part01.py' with the following command:
 ```python3 Proj3_phase2_part1_Dhairya_Harsh.py```
+Sample Inputs 
+start_x = 500
+start_y = 1000
+clearance = 5
+goal_x = 5750
+goal_y = 1000
+rpm1 = 10
+rpm2 = 5
+goal_orientation = 0
 
-5. Follow the prompts in the terminal to input the required parameters.
+6. Follow the prompts in the terminal to input the required parameters.
 
-6. The path will be visualized in a plot after a few seconds.
+7. The path will be visualized in a plot after a few seconds.
 
 
 ## Part 2: 2D Implementation
@@ -53,6 +62,9 @@ Source ROS (Package will be identified)
 Run Code to Test
 Launch Environment
 ```ros2 launch turtlebot3_project3 competition_world.launch.py```
+Sample Inputs 
+goal_x = 5750
+goal_y = 1000
 
 3. Opem the new terminal window and Source workspace using command:
 ```source install/setup.bash```
