@@ -284,6 +284,18 @@ def calculate_twist(rpm1,rpm2,theta):
         linear_x.append((r/2) * ((rpm1[i]*(2*math.pi/60))+(rpm2[i]*(2*math.pi/60))*(math.cos(theta[i]*(math.pi/180)))))
         angular_z.append((r/L) * ((rpm1[i]*(2*math.pi/60))-(rpm2[i]*(2*math.pi/60))))
     return linear_x, angular_z
+
+def calculate_twist2(x_path, y_path):
+        distance = []
+        angle = []
+        linear_x = []
+        angular_z = []
+        for i in range(len(x_path)):
+            distance.append(math.sqrt(((x_path[i+1] - x_path[i]))**2 + ((y_path[i + 1] - y_path[i]))**2))
+            linear_x.append(distance[i] / 10)  # Adjust linear velocity as needed
+            angle.append(math.atan2(y_path[i + 1] - y_path[i], x_path[i + 1] - x_path[i]))
+            angular_z.append(angle[i] / 2)  # Adjust angular velocity as needed
+            return linear_x, angular_z, distance
     
 def main():
     plotter = Plotter()
@@ -341,6 +353,9 @@ def main():
     linear_x, angular_z = calculate_twist(rpm1, rpm2, theta_path)
     print(len(linear_x), len(angular_z), "Lengths from Calcualte Twist 1")
     print(linear_x, angular_z)
+    linx, angz, distance = calculate_twist2(x_path, y_path)
+    print(len(linx), len(angz), len(distance), "Lengths form Calculate Twist 2")
+    print(linx, angz, distance)
     print(len(x_path), x_path)
 
 if __name__ == '__main__':
