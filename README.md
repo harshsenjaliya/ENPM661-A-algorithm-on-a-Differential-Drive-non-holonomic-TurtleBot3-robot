@@ -14,7 +14,7 @@ This part of the project implements the A* search algorithm for path planning on
 ### Instructions
 To run the 2D implementation, follow these steps:
 1. Clone the repository:
-```git clone https://github.com/```
+```git clone https://github.com/harshsenaliya4433/ENPM661-A-algorithm-on-a-Differential-Drive-non-holonomic-TurtleBot3-robot.git```
 
 2. Navigate to the directory where the repository is cloned.
 ```cd Path-Planning-for-a-differential-drive-robot-using-A-Star-Search-Algorithm```
